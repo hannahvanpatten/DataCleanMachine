@@ -5,6 +5,8 @@ import pandas as pd
 dataset = "" # INSERT FILE NAME HERE
 original_dataset = pd.read_csv(dataset) # Provide a way to access original dataset for comparability
 
+
+
 # ---------Function Definitions----------
 def load_and_inspect(file_path: str) -> pd.DataFrame: # Load a dataset and print basic structural health metrics
     global df
@@ -22,6 +24,7 @@ def load_and_inspect(file_path: str) -> pd.DataFrame: # Load a dataset and print
     print("")
     return df
 
+
 def clean_column_names(df: pd.DataFrame) -> pd.DataFrame: # Standardize columns
     df.columns = (
         df.columns.str.strip() # Remove leading and trailing whitespace from column names
@@ -36,6 +39,7 @@ def clean_column_names(df: pd.DataFrame) -> pd.DataFrame: # Standardize columns
     print("")
     return df
 
+
 def handle_duplicates(df: pd.DataFrame) -> pd.DataFrame: # Remove exact duplicate rows from the dataset
     initial_rows = len(df)
     df = df.drop_duplicates().reset_index(drop=True) # Remove duplicates and clean up index
@@ -48,9 +52,42 @@ def handle_duplicates(df: pd.DataFrame) -> pd.DataFrame: # Remove exact duplicat
     return df
 
 
+def handle_missing_values(
+  df: pd.DataFrame, num_strategy="median", cat_strategy="placeholder"
+) -> pd.DataFrame: # Impute or drop missing data based on column data type (EDIT num_strategy, cat_strategy, AND fillna() BELOW AS NEEDED)
+  for col in df.columns:
+    if df[col].isnull().sum() == 0:
+      continue 
+# Process numerical columns 
+    if pds := pd.api.types.is_numeric_dtype(df[col]):
+      if num_strategy == "median":
+        df[col] = df[col].fillna(df[col].median())
+      elif num_strategy == "mean":
+        df[col] = df[col].fillna(df[col].mean())
+      elif num_strategy == "drop":
+        df = df.dropna(subset=[col])
+# Process categorical or object columns
+    else:
+      if cat_strategy == "placeholder": # UPDATE placeholder AS NEEDED
+        df[col] = df[col].fillna("Unknown") # UPDATE Unknown AS NEEDED
+      elif cat_strategy == "mode":
+        df[col] = df[col].fillna(df[col].mode()[0])
+      elif cat_strategy == "drop":
+        df = df.dropna(subset=[col])
+    print("Missing Values Cleanup")
+    print("----------------------")
+    print(df.head())
+    print("")
+    print("")
+  return df
+
+
+
 # ------------Function Calls-------------
 load_and_inspect(dataset)
 
 clean_column_names(df)
 
 handle_duplicates(df)
+
+handle_missing_values(df)
