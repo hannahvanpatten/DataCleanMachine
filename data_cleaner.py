@@ -2,7 +2,8 @@
 import numpy as np
 import pandas as pd
 
-original_csv = "" # INSERT FILE NAME HERE
+dataset = "" # INSERT FILE NAME HERE
+original_dataset = pd.read_csv(dataset) # Provide a way to access original dataset for comparability
 
 # ---------Function Definitions----------
 def load_and_inspect(file_path: str) -> pd.DataFrame: # Load a dataset and print basic structural health metrics
@@ -24,9 +25,15 @@ def clean_column_names(df: pd.DataFrame) -> pd.DataFrame: # Standardize columns
     )
     return df
 
+def handle_duplicates(df: pd.DataFrame) -> pd.DataFrame: # Remove exact duplicate rows from the dataset
+    initial_rows = len(df)
+    df = df.drop_duplicates().reset_index(drop=True) # Remove duplicates and clean up index
+    print(f"Dropped {initial_rows - len(df)} exact duplicate rows.")
+    return df
+
 
 # ------------Function Calls-------------
-load_and_inspect(original_csv)
+load_and_inspect(dataset)
 print("")
 print("")
 print("Original Dataset Preview")
