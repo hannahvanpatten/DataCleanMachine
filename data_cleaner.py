@@ -134,16 +134,24 @@ def handle_outliers_iqr(df: pd.DataFrame, factor=1.5) -> pd.DataFrame: # Cap num
   return df
 
 
+def save_clean_file(output_path: str): # Save cleaned file
+  df.to_csv(output_path, index=False)
+  print(f"\nPipeline complete! Cleaned data saved to: {output_path}")
+  return df
+
+
 
 # ------------Function Calls-------------
-load_and_inspect(dataset)
+df = load_and_inspect(dataset)
 
-clean_column_names(df)
+df = clean_column_names(df)
 
-handle_duplicates(df)
+df = handle_duplicates(df)
 
-handle_missing_values(df)
+df = handle_missing_values(df)
 
-clean_text_columns(df)
+df = clean_text_columns(df)
 
-handle_outliers_iqr(df)
+df = handle_outliers_iqr(df)
+
+df = save_clean_file("cleaned_data.csv")
