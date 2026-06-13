@@ -82,6 +82,18 @@ def handle_missing_values(
   return df
 
 
+def clean_text_columns(df: pd.DataFrame) -> pd.DataFrame: # Standardize text string formatting across object columns
+  for col in df.select_dtypes(include=["object"]): # Strip trailing/leading whitespace and normalize to lowercase
+    df[col] = df[col].astype(str).str.strip().str.lower() # Replace empty strings resulting from strip with NaN
+    df[col] = df[col].replace("", np.nan)
+  print("Text Columns Cleanup")
+  print("--------------------")
+  print(df.head())
+  print("")
+  print("")
+  return df
+
+
 
 # ------------Function Calls-------------
 load_and_inspect(dataset)
@@ -91,3 +103,5 @@ clean_column_names(df)
 handle_duplicates(df)
 
 handle_missing_values(df)
+
+clean_text_columns(df)
