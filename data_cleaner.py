@@ -140,18 +140,16 @@ def save_clean_file(output_path: str): # Save cleaned file
   return df
 
 
+def clean_pipeline(file_path: str, output_path: str) -> pd.DataFrame:
+  df = load_and_inspect(dataset)
+  df = clean_column_names(df)
+  df = handle_duplicates(df)
+  df = handle_missing_values(df)
+  df = clean_text_columns(df)
+  df = handle_outliers_iqr(df)
+  df = save_clean_file(new_file)
 
-# ------------Function Calls-------------
-df = load_and_inspect(dataset)
 
-df = clean_column_names(df)
 
-df = handle_duplicates(df)
-
-df = handle_missing_values(df)
-
-df = clean_text_columns(df)
-
-df = handle_outliers_iqr(df)
-
-df = save_clean_file("cleaned_data.csv")
+# ------------Function Call--------------
+clean_pipeline(dataset, new_file)
