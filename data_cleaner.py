@@ -4,6 +4,8 @@ import pandas as pd
 
 dataset = "" # INSERT FILE NAME HERE
 original_dataset = pd.read_csv(dataset) # Provide a way to access original dataset for comparability
+initial_rows = ""
+new_rows = ""
 
 
 
@@ -41,15 +43,17 @@ def clean_column_names(df: pd.DataFrame) -> pd.DataFrame: # Standardize columns
 
 
 def handle_duplicates(df: pd.DataFrame) -> pd.DataFrame: # Remove exact duplicate rows from the dataset
-    initial_rows = len(df)
-    df = df.drop_duplicates().reset_index(drop=True) # Remove duplicates and clean up index
-    print("Exact Duplicates Cleanup")
-    print("------------------------")
-    print(df.head())
-    print(f"Dropped {initial_rows - len(df)} exact duplicate rows.")
-    print("")
-    print("")
-    return df
+  initial_rows = len(df)
+  df = df.drop_duplicates().reset_index(drop=True) # Remove duplicates and clean up index
+  new_rows = len(df)
+  rows_dropped = initial_rows - new_rows
+  print("Exact Duplicates Cleanup")
+  print("------------------------")
+  print(df.head())
+  print(f"Dropped {rows_dropped} exact duplicate rows.")
+  print("")
+  print("")
+  return df
 
 
 def handle_missing_values(
