@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 
+remove_outliers = True # TOGGLE TO FALSE IF CAPPING OUTLIERS INSTEAD
 dataset = "" # INSERT FILE NAME HERE
 original_dataset = pd.read_csv(dataset) # Provide a way to access original dataset for comparability
 initial_rows = ""
@@ -50,7 +51,7 @@ def handle_duplicates(df: pd.DataFrame) -> pd.DataFrame: # Remove exact duplicat
   print("Exact Duplicates Cleanup")
   print("------------------------")
   print(df.head())
-  print(f"Dropped {rows_dropped} exact duplicate rows.")
+  print(f"Dropped {rows_dropped} exact duplicate row(s).")
   print("")
   print("")
   return df
@@ -69,7 +70,11 @@ def handle_missing_values(
       elif num_strategy == "mean":
         df[col] = df[col].fillna(df[col].mean())
       elif num_strategy == "drop":
+        initial_rows = len(df)
         df = df.dropna(subset=[col])
+        new_rows = len(df)
+        rows_dropped = initial_rows - new_rows
+        print(f"Dropped {rows_dropped} row(s) with missing values.")
 # Process categorical or object columns
     else:
       if cat_strategy == "placeholder": # UPDATE placeholder AS NEEDED
@@ -77,7 +82,11 @@ def handle_missing_values(
       elif cat_strategy == "mode":
         df[col] = df[col].fillna(df[col].mode()[0])
       elif cat_strategy == "drop":
+        initial_rows = len(df)
         df = df.dropna(subset=[col])
+        new_rows = len(df)
+        rows_dropped = initial_rows - new_rows
+        print(f"Dropped {rows_dropped} row(s) with missing values.")
     print("Missing Values Cleanup")
     print("----------------------")
     print(df.head())
@@ -106,13 +115,20 @@ def handle_outliers_iqr(df: pd.DataFrame, factor=1.5) -> pd.DataFrame: # Cap num
     iqr = q3 - q1
     lower_bound = q1 - factor * iqr
     upper_bound = q3 + factor * iqr
-    df[col] = np.clip(df[col], lower_bound, upper_bound) # Cap values outside the boundaries
+    if remove_outliers:
+      df = df[(df[col] >= lower_bound) & (df[col] <= upper_bound)]
+    else:
+      values_capped = ((df[col] < lower_bound) | (df[col] > upper_bound)).sum()
+      df[col] = np.clip(df[col], lower_bound, upper_bound) # Cap values outside the boundaries
   new_rows = len(df)
   rows_dropped = initial_rows - new_rows
   print("Outliers Cleanup")
   print("----------------")
   print(df.head())
-  print(f"Dropped {rows_dropped} rows with outliers.")
+  if remove_outliers:
+    print(f"Dropped {rows_dropped} row(s) with outliers.")
+  else:
+    print(f"Capped {total_values_capped} value(s) outside the IQR boundaries.")
   print("")
   print("")
   return df
