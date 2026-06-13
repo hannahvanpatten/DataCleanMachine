@@ -98,6 +98,26 @@ def clean_text_columns(df: pd.DataFrame) -> pd.DataFrame: # Standardize text str
   return df
 
 
+def handle_outliers_iqr(df: pd.DataFrame, factor=1.5) -> pd.DataFrame: # Cap numerical outliers using the interquartile range (IQR) method
+  initial_rows = len(df)
+  for col in df.select_dtypes(include=[np.number]).columns:
+    q1 = df[col].quantile(0.25)
+    q3 = df[col].quantile(0.75)
+    iqr = q3 - q1
+    lower_bound = q1 - factor * iqr
+    upper_bound = q3 + factor * iqr
+    df[col] = np.clip(df[col], lower_bound, upper_bound) # Cap values outside the boundaries
+  new_rows = len(df)
+  rows_dropped = initial_rows - new_rows
+  print("Outliers Cleanup")
+  print("----------------")
+  print(df.head())
+  print(f"Dropped {rows_dropped} rows with outliers.")
+  print("")
+  print("")
+  return df
+
+
 
 # ------------Function Calls-------------
 load_and_inspect(dataset)
@@ -109,3 +129,5 @@ handle_duplicates(df)
 handle_missing_values(df)
 
 clean_text_columns(df)
+
+handle_outliers_iqr(df)
